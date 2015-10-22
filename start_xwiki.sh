@@ -31,4 +31,4 @@ if [[ ${XWIKI_MYSQL_PW} ]] ; then
 fi
 
 
-/usr/share/tomcat-${TOMCAT_VER}/bin/catalina.sh run
+exec /usr/share/tomcat-${TOMCAT_VER}/bin/catalina.sh run
