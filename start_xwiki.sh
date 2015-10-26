@@ -5,28 +5,33 @@ die() {
 	exit 1
 }
 
+tomcatdir="/var/lib/tomcat-${TOMCAT_VER}"
+webappdir="${tomcatdir}/webapps"
+
 if [[ ! -e /var/lib/xwiki ]] ; then
 	mkdir -p /var/lib/xwiki || die
 fi
 chown tomcat:tomcat /var/lib/xwiki || die
 
-if [[ ! -e /var/lib/tomcat-${TOMCAT_VER}/bin ]] ; then
-	mkdir -p /var/lib/tomcat-${TOMCAT_VER}/bin || die
+if [[ ! -e "${tomcatdir}"/bin ]] ; then
+	mkdir -p "${tomcatdir}"/bin || die
 fi
-chown tomcat:tomcat /var/lib/tomcat-${TOMCAT_VER}/bin || die
+chown tomcat:tomcat "${tomcatdir}"/bin || die
 
-if [[ ! -e /var/lib/tomcat-${TOMCAT_VER}/webapps/xwiki ]] ; then
-	mkdir -p /var/lib/tomcat-${TOMCAT_VER}/webapps || die
+if [[ ! -e "${webappdir}"/.initialized ]] ; then
+	mkdir -p "${webappdir}" || die
+	rm -rf "${webappdir}"/ROOT
 	cp -a /xwiki/tomcat/webapps/xwiki \
-		/var/lib/tomcat-${TOMCAT_VER}/webapps/xwiki \
+		"${webappdir}"/ROOT \
 		|| die
+	touch "${webappdir}"/.initialized || die
 fi
 
 
 if [[ ${XWIKI_MYSQL_PW} ]] ; then
 	sed -i \
 		-e "/connection.password/s|>.*</property>|>${XWIKI_MYSQL_PW}</property>|" \
-		/var/lib/tomcat-${TOMCAT_VER}/webapps/xwiki/WEB-INF/hibernate.cfg.xml \
+		"${webappdir}"/ROOT/WEB-INF/hibernate.cfg.xml \
 		|| die
 fi
 
